@@ -2,23 +2,23 @@ import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import session from "cookie-session";
-import { config } from "./config/app.config";
-import connectDatabase from "./config/database.config";
-import { errorHandler } from "./middlewares/errorHandler.middleware";
+import { config } from "./src/config/app.config";
+import connectDatabase from "./src/config/database.config";
+import { errorHandler } from "./src/middlewares/errorHandler.middleware";
 import listEndpoints from "express-list-endpoints";
 
-import "./config/passport.config";
+import "./src/config/passport.config";
 import passport from "passport";
 
-import authRoutes from "./routes/auth.route";
-import userRoutes from "./routes/user.route";
-import workspaceRoutes from "./routes/workspace.route";
-import memberRoutes from "./routes/member.route";
-import projectRoutes from "./routes/project.route";
-import taskRoutes from "./routes/task.route";
+import authRoutes from "./src/routes/auth.route";
+import userRoutes from "./src/routes/user.route";
+import workspaceRoutes from "./src/routes/workspace.route";
+import memberRoutes from "./src/routes/member.route";
+import projectRoutes from "./src/routes/project.route";
+import taskRoutes from "./src/routes/task.route";
 
-import isAuthenticated from "./middlewares/isAuthenticated.middleware";
-import { autoInjectRoles } from "./startup/autoInjectRoles";
+import isAuthenticated from "./src/middlewares/isAuthenticated.middleware";
+import { autoInjectRoles } from "./src/startup/autoInjectRoles";
 
 // ----------------------------------------------------------------------
 // Create Express App
@@ -89,10 +89,20 @@ app.use(errorHandler);
 // ----------------------------------------------------------------------
 if (config.NODE_ENV !== "production") {
   console.log("Registered Routes:");
+
+  const endpoints = listEndpoints(app) as {
+    path: string;
+    methods: string[];
+  }[];
+
   console.table(
-    listEndpoints(app).map(({ path, methods }) => ({ path, methods: methods.join(", ") }))
+    endpoints.map((route) => ({
+      path: route.path,
+      methods: route.methods.join(", "),
+    }))
   );
 }
+
 
 // ----------------------------------------------------------------------
 // Start Server — ONLY AFTER DB + Roles are ready
