@@ -53,12 +53,13 @@ app.use(
   session({
     name: "session",
     secret: config.SESSION_SECRET,
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    secure: config.NODE_ENV === "production",
+    maxAge: 24 * 60 * 60 * 1000,
+    secure: config.NODE_ENV === "production",  // HTTPS only in production
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: config.NODE_ENV === "production" ? "none" : "lax",
   })
 );
+
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -66,7 +67,7 @@ app.use(passport.session());
 // ----------------------------------------------------------------------
 // Routes
 // ----------------------------------------------------------------------
-const BASE_PATH = config.BASE_PATH || "/api/v1";
+const BASE_PATH = config.BASE_PATH;
 
 app.get("/", (req, res) => {
   res.json({ message: "API is running", version: "1.0.0" });
